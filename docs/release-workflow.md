@@ -118,16 +118,16 @@
 
 ```bash
 # 删除远程标签 v0.0.1
-git push origin --delete v0.0.1
+git push origin --delete 0.0.1
 
 # 如果需要，删除本地标签（如果存在）
-git tag -d v0.0.1
+git tag -d 0.0.1
 
 # 重新创建本地标签（可选 - 指向当前提交）
-git tag v0.0.1
+git tag 0.0.1
 
 # 推送标签到远程（触发 Actions）
-git push origin v0.0.1
+git push origin 0.0.1
 ```
 
 说明：
@@ -135,4 +135,3 @@ git push origin v0.0.1
 - 删除远程 tag 会移除相应的 GitHub Release（如有）。有时需要在 GitHub Releases 页面删除 Draft Release 后再重新创建 tag。
 - 在重新创建并推送 tag 后，工作流会重新运行，生成新的 Release 并上传资产。
 - 注意：如果你的 Release 已经发布（而非草稿），删除 tag 并不会自动删除该 Release；你可能还需在 Releases 页面手动删除相应的 Release 条目。
-
