@@ -83,6 +83,20 @@ git tag -a v1.0.0 -m "Release version 1.0.0"
 git push origin v1.0.0
 ```
 
+### 列出标签
+
+- 列出本地所有标签：
+
+  ```bash
+  git tag
+  ```
+
+- 列出远程标签：
+
+  ```bash
+  git ls-remote --tags origin
+  ```
+
 ### 删除标签
 
 如果需要删除标签（例如标签名错误）：
