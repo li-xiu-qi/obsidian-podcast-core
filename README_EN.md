@@ -1,4 +1,4 @@
-# 🎙️ Podcast Generator
+# 🎙️ Podcast Core
 
 Transform your notes into engaging podcasts using AI. Generate scripts and audio with customizable voices for solo monologues or dialogues.
 
@@ -21,7 +21,7 @@ Transform your notes into engaging podcasts using AI. Generate scripts and audio
 ### Installation
 
 1. Open Obsidian Settings → Third-party plugins → Community plugins
-2. Search for "Podcast Generator"
+2. Search for "Podcast Core"
 3. Install and enable the plugin
 
 ### Configuration
