@@ -171,6 +171,20 @@
                             <DocumentText />
                         </Icon>
                         <span>{{ t('Generated Script') }}</span>
+                        <NButton
+                            v-if="Array.isArray(script) && script.length > 0"
+                            size="small"
+                            type="default"
+                            @click="copyScript"
+                            style="margin-left: auto;"
+                        >
+                            <template #icon>
+                                <Icon>
+                                    <Copy />
+                                </Icon>
+                            </template>
+                            {{ t('Copy Script') }}
+                        </NButton>
                     </div>
                     <div v-if="Array.isArray(script) && script.length > 0" class="script-chat">
                         <div
@@ -216,7 +230,7 @@ import {
     type SelectOption,
 } from 'naive-ui';
 import { Icon } from "@vicons/utils";
-import { PersonCircle, PeopleCircle, PlayCircle, Download, Mic, Language, Settings, VolumeHigh, Cog, CheckmarkCircle, CloseCircle, Time, MusicalNote, DocumentText } from '@vicons/ionicons5';
+import { PersonCircle, PeopleCircle, PlayCircle, Download, Mic, Language, Settings, VolumeHigh, Cog, CheckmarkCircle, CloseCircle, Time, MusicalNote, DocumentText, Copy } from '@vicons/ionicons5';
 import { t } from '../lang/helper';
 import type { PodcastPlugin } from '../plugin';
 import { generatePodcastScript, generateAudio, PodcastScript } from '../podcast-generator';
@@ -378,6 +392,23 @@ const exportMp3 = async () => {
     } catch (error) {
         const message = (error as any)?.message ?? String(error);
         new Notice(`Error exporting MP3: ${message}`);
+        console.error(error);
+    }
+};
+
+const copyScript = async () => {
+    if (!script.value || !Array.isArray(script.value)) {
+        new Notice(t('No script available to copy'));
+        return;
+    }
+
+    try {
+        const scriptText = script.value.map(line => `${line.speaker}: ${line.text}`).join('\n');
+        await navigator.clipboard.writeText(scriptText);
+        new Notice(t('Script copied to clipboard'));
+    } catch (error) {
+        const message = (error as any)?.message ?? String(error);
+        new Notice(`Error copying script: ${message}`);
         console.error(error);
     }
 };

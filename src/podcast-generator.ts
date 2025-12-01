@@ -184,83 +184,97 @@ export async function generateAudio(
         throw new Error('TTS API Key is not configured. Please set it in settings.');
     }
 
-    // 根据模式构建TTS输入
-    let ttsInputText: string;
-    let requestBody: any;
-
-    if (mode === 'monologue') {
-        // 对于独白：组合文本但不加说话者前缀以获得自然音频
-        ttsInputText = script.map(s => s.text).join(' ');
-        requestBody = {
+    // 辅助函数：生成单个音频片段
+    async function generateSingleAudio(text: string, voice: string): Promise<ArrayBuffer> {
+        const requestBody = {
             model: ttsModel,
-            voice: (settings as any)?.monologueVoice || 'qinhenvsheng',
-            input: ttsInputText,
+            voice,
+            input: text,
         };
-    } else {
-        // 对于对话：使用说话者：文本格式以支持多说话者TTS
-        ttsInputText = script.map(s => `${s.speaker}: ${s.text}`).join('\n');
-        requestBody = {
-            model: ttsModel,
-            voice: (settings as any)?.hostVoice || 'qinhenvsheng',
-            input: ttsInputText,
-        };
-    }
 
-    let arrayBuffer: ArrayBuffer | null = null;
+        let arrayBuffer: ArrayBuffer | null = null;
 
-    // 首先尝试使用原生fetch以避免SDK添加的头部导致CORS问题
-    if (globalThis.fetch) {
-        try {
-            const speechUrl = `${ttsBaseUrl}/audio/speech`;
-            const response = await globalThis.fetch(speechUrl, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${ttsApiKey}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody),
+        // 首先尝试使用原生fetch
+        if (globalThis.fetch) {
+            try {
+                const speechUrl = `${ttsBaseUrl}/audio/speech`;
+                const response = await globalThis.fetch(speechUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${ttsApiKey}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody),
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error(`Fetch failed with status ${response.status}: ${errorText}`);
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                arrayBuffer = await response.arrayBuffer();
+                console.log('Successfully generated audio segment via native fetch');
+            } catch (fetchError) {
+                console.warn('Native fetch failed for audio segment, falling back to SDK:', fetchError);
+            }
+        }
+
+        // 如果fetch失败，使用SDK
+        if (!arrayBuffer) {
+            const fetchOptions = globalThis.fetch ? { fetch: globalThis.fetch } : {};
+            const client = new OpenAI({
+                apiKey: ttsApiKey,
+                baseURL: ttsBaseUrl,
+                dangerouslyAllowBrowser: true,
+                ...fetchOptions
             });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error(`Fetch failed with status ${response.status}: ${errorText}`);
-                throw new Error(`HTTP ${response.status}: ${errorText}`);
+            try {
+                const response = await client.audio.speech.create(requestBody);
+                arrayBuffer = await response.arrayBuffer();
+                console.log('Successfully generated audio segment via SDK fallback');
+            } catch (sdkError) {
+                const message = (sdkError as any)?.message ?? String(sdkError);
+                console.error('SDK fallback also failed for audio segment:', sdkError);
+                throw new Error(`Failed to generate audio segment: ${message}`);
             }
+        }
 
-            arrayBuffer = await response.arrayBuffer();
-            console.log('Successfully generated audio via native fetch');
-        } catch (fetchError) {
-            console.warn('Native fetch failed for audio, falling back to SDK:', fetchError);
-            // 回退到SDK
+        if (!arrayBuffer) {
+            throw new Error('Failed to generate audio segment: no valid response');
+        }
+
+        return arrayBuffer;
+    }
+
+    let audioBuffers: ArrayBuffer[] = [];
+
+    if (mode === 'monologue') {
+        // 对于独白：组合所有文本，使用单人语音
+        const ttsInputText = script.map(s => s.text).join(' ');
+        const voice = (settings as any)?.monologueVoice || 'qinhenvsheng';
+        audioBuffers.push(await generateSingleAudio(ttsInputText, voice));
+    } else {
+        // 对于对话：为每个说话者片段生成音频，使用对应语音
+        for (const s of script) {
+            const voice = s.speaker === 'Host' 
+                ? (settings as any)?.hostVoice || 'qinhenvsheng'
+                : (settings as any)?.guestVoice || 'wenrounansheng';
+            audioBuffers.push(await generateSingleAudio(s.text, voice));
         }
     }
 
-    // 如果fetch失败或不可用，则使用带有dangerouslyAllowBrowser的SDK
-    if (!arrayBuffer) {
-        const fetchOptions = globalThis.fetch ? { fetch: globalThis.fetch } : {};
-        const client = new OpenAI({
-            apiKey: ttsApiKey,
-            baseURL: ttsBaseUrl,
-            dangerouslyAllowBrowser: true,
-            ...fetchOptions
-        });
-
-        try {
-            const response = await client.audio.speech.create(requestBody);
-            arrayBuffer = await response.arrayBuffer();
-            console.log('Successfully generated audio via SDK fallback');
-        } catch (sdkError) {
-            const message = (sdkError as any)?.message ?? String(sdkError);
-            console.error('SDK fallback also failed for audio:', sdkError);
-            throw new Error(`Failed to generate audio: ${message}`);
-        }
+    // 拼接所有音频缓冲区
+    const totalLength = audioBuffers.reduce((sum, buf) => sum + buf.byteLength, 0);
+    const concatenated = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const buf of audioBuffers) {
+        concatenated.set(new Uint8Array(buf), offset);
+        offset += buf.byteLength;
     }
 
-    if (!arrayBuffer) {
-        throw new Error('Failed to generate audio: no valid response');
-    }
-
-    const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
+    const blob = new Blob([concatenated], { type: 'audio/mpeg' });
     return URL.createObjectURL(blob);
 }
 

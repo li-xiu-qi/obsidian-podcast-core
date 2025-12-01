@@ -65,4 +65,6 @@ export default {
     'Audio generated successfully': 'Audio generated successfully',
     'No audio available to export': 'No audio available to export',
     'MP3 exported successfully': 'MP3 exported successfully',
+    'No script available to copy': 'No script available to copy',
+    'Script copied to clipboard': 'Script copied to clipboard',
 };

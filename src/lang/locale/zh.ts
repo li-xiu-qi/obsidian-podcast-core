@@ -65,4 +65,6 @@ export default {
     'Audio generated successfully': '音频生成成功',
     'No audio available to export': '没有可导出的音频',
     'MP3 exported successfully': 'MP3 导出成功',
+    'No script available to copy': '没有可复制的脚本',
+    'Script copied to clipboard': '脚本已复制到剪贴板',
 };
