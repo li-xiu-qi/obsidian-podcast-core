@@ -67,7 +67,7 @@
 - Release 创建为草稿，需要手动发布以使其公开。
 - 确保 `GITHUB_TOKEN` 有足够的权限创建 Release 和上传资产。
 - 如果构建失败，检查 `npm run build` 的配置和依赖。
-- 工作流会上传编译后的插件文件作为 Release 资产：`main.js`、`manifest.json` 和 `styles.css`，并会打包一个 `obsidian-auto-tags-<tag>.zip`（包含这三个文件）作为附加资产。
+- 工作流会上传编译后的插件文件作为 Release 资产：`main.js`、`manifest.json` 和 `styles.css`，并会打包一个 `obsidian-podcast-core-<tag>.zip`（包含这三个文件）作为附加资产。
 
 ## 常见错误与排查
 

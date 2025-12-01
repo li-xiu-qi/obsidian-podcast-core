@@ -73,7 +73,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y zip
 
       - name: Package plugin zip
-        run: zip -j obsidian-auto-tags-${{ github.ref_name }}.zip main.js manifest.json styles.css || true
+        run: zip -j obsidian-podcast-core-${{ github.ref_name }}.zip main.js manifest.json styles.css || true
 
       - name: Upload release asset - plugin zip
         uses: actions/upload-release-asset@v1
@@ -81,8 +81,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./obsidian-auto-tags-${{ github.ref_name }}.zip
-          asset_name: obsidian-auto-tags-${{ github.ref_name }}.zip
+          asset_path: ./obsidian-podcast-core-${{ github.ref_name }}.zip
+          asset_name: obsidian-podcast-core-${{ github.ref_name }}.zip
           asset_content_type: application/zip
 
       # Minimal workflow: build and upload assets (main.js, manifest.json, styles.css + zip)

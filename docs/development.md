@@ -5,8 +5,8 @@
 要开始开发这个插件，首先从 GitHub 克隆项目：
 
 ```bash
-git clone https://github.com/li-xiu-qi/auto-tags.git
-cd auto-tags
+git clone https://github.com/li-xiu-qi/obsidian-podcast-core.git
+cd obsidian-podcast-core
 ```
 
 ## 编译插件

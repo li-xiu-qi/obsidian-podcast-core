@@ -3,7 +3,7 @@
     "name": "Podcast Core",
     "version": "0.01",
     "minAppVersion": "0.15.6",
-    "description": "Transform your notes into engaging podcasts using AI. Generate scripts and audio with customizable voices for solo monologues or dialogues.",
+    "description": "将你的笔记转化为高质量的播客。使用 AI 生成脚本，支持独白和对话模式，多种音色可选。 | Transform your notes into engaging podcasts using AI. Generate scripts and audio with customizable voices for solo monologues or dialogues.",
     "author": "li-xiu-qi",
     "authorUrl": "https://github.com/li-xiu-qi",
     "fundingUrl": "https://github.com/li-xiu-qi",
