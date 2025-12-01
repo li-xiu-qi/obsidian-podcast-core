@@ -1,0 +1,90 @@
+/* Podcast Generator Panel Styles */
+
+.podcast-panel {
+    --custom-font-size: var(--nav-item-size);
+    --custom-font-family: inherit;
+    --custom-font-weight: inherit;
+    --custom-line-height: 1.6em;
+    --custom-line-gap: 0px;
+}
+
+/* Button Styles */
+.podcast-panel .n-button {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.podcast-panel .n-button--primary:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Select Dropdown */
+.podcast-panel .n-select {
+    font-size: var(--font-ui-small);
+    border-radius: 8px;
+}
+
+.podcast-panel .n-base-select-menu {
+    background-color: var(--background-primary);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Button Group */
+.podcast-panel .n-button-group {
+    display: flex;
+    gap: 0;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.podcast-panel .n-button-group .n-button {
+    flex: 1;
+    border-radius: 0;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(52, 152, 219, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+    .podcast-panel {
+        padding: 12px;
+    }
+}

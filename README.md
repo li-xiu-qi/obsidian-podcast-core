@@ -1,104 +1,173 @@
-# 🪄 auto tags / AI 标签器
+# 🎙️ 播客生成器
 
-[English Version](README_EN.md)
+将你的笔记转化为高质量的播客。使用 AI 生成脚本，支持独白和对话模式，多种音色可选。
 
-auto tags 是一个 Obsidian ([https://obsidian.md](https://obsidian.md)) 插件，通过使用各种大型语言模型（LLM）来分析并为你的文档一键生成标签。
+[English](./README_EN.md)
 
-该插件会分析你当前编辑器中打开的文档内容以及你历史上使用过的标签（若有），返回最多 5 个你之前使用过的相关标签，并最多生成 3 个全新的建议标签。
+## ✨ 功能
 
-本项目继承自 [lucagrippa/obsidian-ai-tagger](https://github.com/lucagrippa/obsidian-ai-tagger)，并在此基础上进行了代码更新和功能增强。
-
-## 📚 文档
-
-- [快速开始](docs/quick-start.md)
-- [标签生成器设计](docs/tag-generator-design.md)
-- [开发指南](docs/development.md)
-
-## 🚀 快速开始
-
-本项目继承自 [lucagrippa/obsidian-ai-tagger](https://github.com/lucagrippa/obsidian-ai-tagger)，并在此基础上进行了代码更新和功能增强。
+- **🤖 AI 驱动的脚本生成** - 使用大语言模型自动将笔记转换为自然流畅的播客脚本
+- **🎙️ 多种生成模式** - 支持独白模式和对话模式
+- **🎵 自定义音色选择** - 支持多种音色选择，适配不同场景
+- **📝 脚本预览** - 在生成音频前预览和查看生成的脚本
+- **🔊 音频生成** - 使用 TTS 技术将脚本转换为高质量音频
+- **💾 MP3 导出** - 支持将播客下载为 MP3 文件
+- **🌍 国际化支持** - 支持中英文界面
+- **⚙️ 简易配置** - 只需配置 API 密钥即可使用
+- **🎨 现代化 UI** - 美观直观的界面，实时反馈生成进度
 
 ## 🚀 快速开始
 
-1. 在 Obsidian 的社区插件中安装并启用本插件。
-2. 在插件设置中，输入你的 API 密钥（支持 OpenAI、Ollama 等兼容服务）。
-3. 选择模型（如 GPT-4o mini）。
+### 安装
 
-## 📝 使用
+1. 打开 Obsidian 设置 → 第三方插件 → 浏览社区插件
+2. 搜索 "Podcast Generator"
+3. 安装并启用插件
 
-### 一键标记
+### 配置
 
-- 点击左侧边栏的"魔杖"图标来标记当前笔记
+1. 在 Obsidian 中打开插件设置
+2. 配置必要的 API 密钥：
+   - **LLM API Key**: 用于脚本生成的 StepFun API 密钥
+   - **TTS API Key**: 用于音频生成的 StepFun API 密钥
+3. （可选）调整音色偏好和默认设置
 
-    ![一键标记](images/one_click_tagging.gif)
+### 使用
 
-### 基于选中文本的标记
+1. 打开想要转换为播客的笔记
+2. 点击侧边栏的"播客生成器"图标
+3. 选择生成模式：
+   - **单人独白**: 单个讲述者音色
+   - **双人对话**: 两个讲话者的对话格式
+4. 选择音色选项
+5. 点击"生成播客"按钮
+6. 查看生成的脚本并试听音频
+7. 点击"导出 MP3"下载播客文件
 
-- 高亮文本并使用命令面板（Ctrl/Cmd + P）→ "Generate tags"
+## 📖 工作原理
 
-    ![精确标记](images/precise_tagging.gif)
+### 生成流程
 
-### 批量标记
+```mermaid
+flowchart TD
+    A[笔记内容] --> B[LLM 处理]
+    B --> C[生成的播客脚本]
+    C --> D[TTS 处理]
+    D --> E[MP3 音频文件]
+    E --> F[下载和播放]
+```
 
-- 右键点击文件或文件夹来标记多个文档
+### 独白模式
 
-    ![多文件标记](images/multi_file_tagging.gif)
+- 单个讲述者呈现内容
+- 适合教育类或讲解类内容
+- 音色风格一致
 
-## 🔧 配置选项
+### 对话模式
 
-- 自定义端点：设置替代 API 端点（支持openai sdk、Ollama 等兼容服务）
-- 小写标签：强制所有标签为小写
-- 上下文感知：插件考虑现有标签以避免重复
+- 两个讲话者（主持人和嘉宾）讨论内容
+- 更加生动有趣
+- 模拟真实的对话风格
 
-    ![上下文感知标记](images/context_aware_tagging.gif)
+## ⚙️ 设置
 
-## 🔧 功能
+### API 配置
 
-### 1. 设置管理
+| 设置 | 说明 |
+|------|------|
+| LLM API Key | 脚本生成用的 API 密钥（必填，兼容 OpenAI SDK 格式） |
+| LLM Model | 模型名称（默认：step-2-mini） |
+| LLM Base URL | API 端点（默认：`https://api.stepfun.com/v1`，兼容 OpenAI SDK 格式） |
+| TTS API Key | 音频生成用的 API 密钥（必填，兼容 OpenAI SDK 格式） |
+| TTS Model | 模型名称（默认：step-tts-2） |
+| TTS Base URL | API 端点（默认：`https://api.stepfun.com/v1`，兼容 OpenAI SDK 格式） |
 
-- 加载和保存插件设置，包括 OpenAI API 密钥、模型名称、基础 URL 和提示语言。
-- 支持默认设置的初始化和用户自定义配置。
-- 通过插件设置标签页允许用户配置 API 密钥、模型选择（如 GPT-4o mini）和语言偏好。
+### 音色设置
 
-### 2. 标签生成
+| 设置 | 说明 |
+|------|------|
+| 独白音色 | 独白模式使用的音色 |
+| 主持人音色 | 对话模式中主持人的音色 |
+| 嘉宾音色 | 对话模式中嘉宾的音色 |
 
-- 使用 AI（OpenAI）为文档内容生成相关标签。
-- 支持去除 frontmatter 后的纯内容进行标签生成。
-- 基于整个仓库的所有标签作为上下文，生成更相关的标签。
-- 避免重复生成现有标签。
-- 分析文档内容，返回最多 5 个相关现有标签和最多 3 个新建议标签。
-- 支持中文和英文提示语言，使用预定义的系统提示和示例。
+### 默认偏好
 
-### 3. 标签应用
+| 设置 | 说明 |
+|------|------|
+| 默认语言 | 界面语言（中文/英文） |
+| 默认模式 | 默认生成模式（独白/对话） |
 
-- 将生成的标签添加到文档的 frontmatter 中。
-- 支持追加新标签到现有标签列表。
-- 使用 Obsidian 的 processFrontMatter API 更新文档元数据。
+## 🎯 使用场景
 
-### 4. 递归标签生成
+### 教育内容
 
-- 支持为单个文件生成标签。
-- 支持为文件夹及其所有子文件递归生成标签。
-- 允许批量处理多个文件，提高效率。
+将讲座笔记转换为播客集，方便在路上学习。
 
-### 5. 用户界面集成
+### 文档
 
-- **工具栏图标**：在 Obsidian 左侧工具栏添加图标按钮，用于为当前活动文档生成标签。
-- **编辑器命令**：添加命令用于为选区或整个文档生成标签，支持命令面板调用。
-- **文件菜单选项**：在文件右键菜单中添加选项，用于为单个或多个文件生成标签，支持右键批量操作。
+将技术文档转换为音频指南。
 
-### 6. 用户通知
+### 博客文章
 
-- 在生成标签过程中显示进度通知。
-- 成功或失败时提供相应反馈。
-- 使用 Obsidian 的 Notice API 显示消息，如生成中、成功或错误提示。
+为博客文章生成播客版本。
 
-## 🔗 更多信息
+### 会议记录
 
-- [快速开始使用](docs/quick-start.md)
-- [开发文档](docs/development.md)
-- [许可证](LICENSE)
+将会议笔记转换为回顾播客。
+
+### 故事讲述
+
+将故事笔记转换为叙述型音频内容。
+
+## 🛠️ 开发
+
+### 需求
+
+- Node.js 16+
+- npm 或 yarn
+
+### 设置
+
+```bash
+npm install
+npm run dev
+```
+
+### 构建
+
+```bash
+npm run build
+```
+
+### 测试
+
+```bash
+npm run dev
+```
+
+## 📄 许可证
+
+MIT 许可证 - 详见 LICENSE 文件
 
 ## 🤝 贡献
 
-如果你发现 bug 或想要新功能，欢迎提交 Issue 或 PR。
+欢迎提交问题报告或拉取请求！
+
+## 💬 支持
+
+如有问题、功能请求或其他问题：
+
+- 在 [GitHub](https://github.com/li-xiu-qi/obsidian-podcast-core) 上提交 Issue
+
+## 🙏 致谢
+
+- 基于 [Obsidian API](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin)
+- 使用 [Vue 3](https://vuejs.org/) 构建 UI
+- 集成 [StepFun API](https://www.stepfun.com/)
+- UI 组件来自 [Naive UI](https://www.naiveui.com/)
+
+---
+
+**版本**: 0.01  
+**作者**: li-xiu-qi  
+**许可证**: MIT

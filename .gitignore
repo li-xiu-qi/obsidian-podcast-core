@@ -1,33 +1,57 @@
 # vscode
-.vscode 
+.vscode
+*.code-workspace
 
 # Intellij
 *.iml
 .idea
+.gradle
 
 # npm
-node_modules
+node_modules/
+npm-debug.log*
+package-lock.json
 
-# Don't include the compiled main.js file in the repo.
-# They should be uploaded to GitHub releases instead.
+# Compiled output
 main.js
+main.*.js
+main.css
+styles.css
+*.zip
 
-# Exclude sourcemaps
+# Source maps
 *.map
 
-# obsidian
+# Obsidian
 data.json
+markdown-states.json
+.obsidian/cache
+.obsidian/workspace.json
 
-# Exclude macOS Finder (System Explorer) View States
+# GitHub
+.github/instructions
+.github/agents
+
+# OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+desktop.ini
 
+# Environment
 .env
+.env.local
+.env.*.local
 
-AGENTS.md
+# Test coverage
+coverage/
+.nyc_output/
 
-# Ignore GitHub directory except for workflows
-.github/*
-!.github/workflows/
-
-# Ignore openspec directory
-openspec/
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*~

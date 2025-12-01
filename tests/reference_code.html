@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obsidian Podcast Core (JSON Architecture)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #1e1e1e;
+            color: #dcddde;
+        }
+        .markdown-editor {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #2e2e2e;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #202020; }
+        ::-webkit-scrollbar-thumb { background: #484848; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #5a5a5a; }
+        
+        .obsidian-panel {
+            background-color: #202020;
+            border: 1px solid #363636;
+        }
+        .accent-button {
+            background-color: #7b6cd9;
+            transition: background-color 0.2s;
+        }
+        .accent-button:hover { background-color: #6a5acd; }
+        
+        .mode-tab {
+            cursor: pointer;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-bottom: 2px solid transparent;
+            color: #888;
+            transition: all 0.2s;
+        }
+        .mode-tab.active {
+            color: #dcddde;
+            border-bottom-color: #7b6cd9;
+            font-weight: 500;
+        }
+        
+        /* Chat Bubble Styles */
+        .chat-bubble {
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            max-width: 90%;
+            line-height: 1.5;
+        }
+        .chat-host {
+            background-color: #2d2d3d;
+            border-left: 3px solid #7b6cd9;
+            margin-right: auto;
+        }
+        .chat-guest {
+            background-color: #2a3a2a;
+            border-right: 3px solid #4ade80;
+            margin-left: auto;
+            text-align: right;
+        }
+        .chat-label {
+            font-size: 0.7rem;
+            color: #888;
+            margin-bottom: 2px;
+            font-weight: bold;
+        }
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #7b6cd9;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Top Bar -->
+    <header class="h-12 border-b border-[#363636] flex items-center px-4 justify-between bg-[#202020]">
+        <div class="flex items-center space-x-2 text-[#999]">
+            <i class="fas fa-cube text-[#7b6cd9]"></i>
+            <span class="font-bold text-gray-200">Obsidian Podcast Core</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-[#363636] text-[#888]">v1.2.1-AutoKey</span>
+        </div>
+        <div class="flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-green-500" title="System Ready"></span>
+            <span class="text-xs text-gray-400">System Ready</span>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 flex overflow-hidden">
+        
+        <!-- Left: Editor (Input) -->
+        <section class="flex-1 flex flex-col border-r border-[#363636] min-w-[300px]">
+            <div class="h-9 flex items-center px-4 border-b border-[#363636] bg-[#252525] justify-between">
+                <div class="flex items-center space-x-2 text-sm text-gray-400">
+                    <i class="fas fa-file-alt"></i>
+                    <span>2025年AI趋势笔记.md</span>
+                </div>
+                <span class="text-xs text-gray-500 uppercase tracking-wider">Source</span>
+            </div>
+            <textarea id="sourceText" class="markdown-editor flex-1 w-full p-6 resize-none focus:outline-none focus:ring-1 focus:ring-[#7b6cd9]/50" spellcheck="false"># 2025年生成式AI发展趋势
+
+## 1. 核心观点
+目前的AI发展已经从“玩具”阶段进入了“工具”阶段。我们不再仅仅关注它能生成什么有趣的图，而是关注它如何嵌入工作流。
+
+## 2. 关键观察
+- **模型小型化**：端侧模型（On-device AI）开始普及，手机上跑大模型成为常态。
+- **Agent（智能体）爆发**：AI不再是被动回答，而是主动执行任务。比如帮你订票、写邮件。
+
+## 3. 对创作者的影响
+这不仅是效率的提升，更是门槛的降低。以前你需要学会剪辑软件才能做视频，现在你只需要有好的审美和脚本。
+
+## 4. 结论
+不要焦虑被替代，而是要去思考如何成为那个“驾驭者”。技术是中性的，关键看你如何使用它。
+</textarea>
+        </section>
+
+        <!-- Right: Plugin View (Processing & Output) -->
+        <section class="w-[450px] flex flex-col bg-[#1e1e1e] flex-shrink-0">
+            <div class="h-9 flex items-center px-4 border-b border-[#363636] bg-[#252525] justify-between">
+                <div class="flex items-center space-x-2 text-sm text-gray-400">
+                    <i class="fas fa-podcast"></i>
+                    <span>Podcast Generator</span>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4 space-y-6">
+                
+                <!-- Settings Panel -->
+                <div class="obsidian-panel rounded-lg p-4 space-y-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-semibold text-gray-300">生成模式 (Mode)</h3>
+                    </div>
+
+                    <div class="flex border-b border-[#363636] mb-4">
+                        <div class="mode-tab active" onclick="setMode('monologue')" id="tabMonologue">
+                            <i class="fas fa-user mr-1"></i> 单人独白
+                        </div>
+                        <div class="mode-tab" onclick="setMode('dialogue')" id="tabDialogue">
+                            <i class="fas fa-user-friends mr-1"></i> 双人对谈
+                        </div>
+                    </div>
+
+                    <div id="voiceConfigArea">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <button id="generateBtn" onclick="startGeneration()" class="accent-button w-full py-2.5 rounded-lg text-sm font-medium text-white shadow-lg flex items-center justify-center space-x-2">
+                    <span>生成音频 (Generate)</span>
+                    <i class="fas fa-magic"></i>
+                </button>
+
+                <!-- Processing Log -->
+                <div id="statusLog" class="hidden space-y-2 text-xs font-mono">
+                    <div class="flex items-center space-x-2 text-gray-400">
+                        <div class="loader"></div>
+                        <span id="statusText">Ready</span>
+                    </div>
+                    <div id="consoleOutput" class="h-24 bg-[#111] border border-[#363636] rounded p-2 overflow-y-auto text-gray-500"></div>
+                </div>
+
+                <!-- Result Area -->
+                <div id="resultArea" class="hidden space-y-4 animate-fade-in">
+                    <!-- Audio Player -->
+                    <div class="obsidian-panel rounded-lg p-4 bg-[#252525]">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold text-[#7b6cd9] uppercase tracking-wider">Audio Output</span>
+                        </div>
+                        <audio id="audioPlayer" controls class="w-full h-8 mb-2" style="filter: invert(0.9) hue-rotate(180deg);"></audio>
+                        <div class="flex justify-end">
+                            <button class="text-xs text-gray-400 hover:text-white flex items-center space-x-1">
+                                <i class="fas fa-download"></i>
+                                <span>Export WAV</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Structured Script Display -->
+                    <div class="obsidian-panel rounded-lg p-4">
+                        <h4 class="text-xs font-bold text-gray-400 uppercase mb-3">Generated Script (JSON Parsed)</h4>
+                        <div id="scriptDisplay" class="flex flex-col space-y-2">
+                            <!-- Bubbles injected here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // --- Core Logic ---
+        const apiKey = ""; // Environment will inject here
+        let currentMode = 'monologue';
+
+        // --- UI/Config Handlers ---
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('tabMonologue').classList.toggle('active', mode === 'monologue');
+            document.getElementById('tabDialogue').classList.toggle('active', mode === 'dialogue');
+            
+            const container = document.getElementById('voiceConfigArea');
+            if (mode === 'monologue') {
+                container.innerHTML = `
+                    <div class="pt-2">
+                        <label class="block text-xs text-gray-500 mb-1">讲述者</label>
+                        <select id="singleVoice" class="w-full bg-[#2a2a2a] border border-[#363636] rounded px-2 py-1.5 text-xs text-gray-300 outline-none focus:border-[#7b6cd9]">
+                            <option value="Zephyr">Zephyr (Male - Deep)</option>
+                            <option value="Puck">Puck (Male - Calm)</option>
+                            <option value="Kore">Kore (Female - Soothing)</option>
+                        </select>
+                    </div>`;
+            } else {
+                container.innerHTML = `
+                    <div class="grid grid-cols-2 gap-3 pt-2">
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Host (主持人)</label>
+                            <select id="hostVoice" class="w-full bg-[#2a2a2a] border border-[#363636] rounded px-2 py-1.5 text-xs text-gray-300 outline-none focus:border-[#7b6cd9]">
+                                <option value="Puck">Puck (Male)</option>
+                                <option value="Zephyr">Zephyr (Male)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Guest (嘉宾)</label>
+                            <select id="guestVoice" class="w-full bg-[#2a2a2a] border border-[#363636] rounded px-2 py-1.5 text-xs text-gray-300 outline-none focus:border-[#7b6cd9]">
+                                <option value="Kore">Kore (Female)</option>
+                                <option value="Leda">Leda (Female)</option>
+                            </select>
+                        </div>
+                    </div>`;
+            }
+        }
+        setMode('monologue'); // Init
+
+        // --- Step 1: LLM (JSON Mode) ---
+        async function generateScriptJson(text, mode) {
+            log(`生成结构化脚本 (${mode})...`);
+            
+            let systemPrompt = "";
+            if (mode === 'monologue') {
+                systemPrompt = `
+                Role: Podcast Host.
+                Task: Convert the input notes into a monologue script.
+                Output Format: STRICT JSON Array.
+                Example: [{"speaker": "Narrator", "text": "Welcome back..."}]
+                Rules: Simplified Chinese. Relaxed, professional tone. Keep it under 200 words.
+                `;
+            } else {
+                systemPrompt = `
+                Role: Podcast Producer.
+                Task: Convert notes into a dialogue between Host and Guest.
+                Output Format: STRICT JSON Array.
+                Example: [{"speaker": "Host", "text": "Hello..."}, {"speaker": "Guest", "text": "Hi..."}]
+                Rules: Simplified Chinese. Host introduces, Guest analyzes. Keep it under 200 words.
+                `;
+            }
+
+            const payload = {
+                contents: [{ parts: [{ text: `Input Notes:\n${text}` }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: { responseMimeType: "application/json" } // Force JSON
+            };
+
+            const response = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, payload);
+            const data = await response.json();
+            const rawJson = data.candidates[0].content.parts[0].text;
+            
+            try {
+                return JSON.parse(rawJson);
+            } catch (e) {
+                throw new Error("JSON Parsing Failed: " + rawJson.substring(0, 50));
+            }
+        }
+
+        // --- Step 2: TTS (Structured Input) ---
+        async function synthesizeFromJson(scriptJson, mode) {
+            log("合成语音...");
+            
+            // 1. Reconstruct Text for Gemini TTS (Speaker: Text format)
+            let ttsInputText = "";
+            scriptJson.forEach(item => {
+                let speakerName = item.speaker;
+                if(mode === 'monologue') speakerName = "Narrator"; 
+                if(mode === 'dialogue' && !['Host', 'Guest'].includes(speakerName)) speakerName = "Host"; 
+                
+                // For monologue, we don't need speaker prefixes in text for single voice
+                if (mode === 'monologue') {
+                    ttsInputText += item.text + " ";
+                } else {
+                    ttsInputText += `${speakerName}: ${item.text}\n`;
+                }
+            });
+
+            // 2. Build Payload
+            let payload = {
+                contents: [{ parts: [{ text: ttsInputText }] }],
+                generationConfig: { responseModalities: ["AUDIO"], speechConfig: {} },
+                model: "gemini-2.5-flash-preview-tts"
+            };
+
+            if (mode === 'monologue') {
+                const voice = document.getElementById('singleVoice').value;
+                payload.generationConfig.speechConfig = {
+                    voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } }
+                };
+            } else {
+                const hostVoice = document.getElementById('hostVoice').value;
+                const guestVoice = document.getElementById('guestVoice').value;
+                payload.generationConfig.speechConfig = {
+                    voiceConfig: {
+                        multiSpeakerVoiceConfig: {
+                            speakerVoiceConfigs: [
+                                { speaker: "Host", voiceConfig: { prebuiltVoiceConfig: { voiceName: hostVoice } } },
+                                { speaker: "Guest", voiceConfig: { prebuiltVoiceConfig: { voiceName: guestVoice } } }
+                            ]
+                        }
+                    }
+                };
+            }
+
+            const response = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`, payload);
+            const data = await response.json();
+            if (!data.candidates || !data.candidates[0].content.parts[0].inlineData) throw new Error("No Audio Data");
+            return data.candidates[0].content.parts[0].inlineData.data;
+        }
+
+        // --- Utilities ---
+        async function fetchWithRetry(url, payload, retries = 3) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!res.ok) {
+                        const txt = await res.text();
+                        if (res.status === 401) throw new Error("API Key Invalid (401)");
+                        throw new Error(`HTTP ${res.status}: ${txt}`);
+                    }
+                    return res;
+                } catch (e) {
+                    if (e.message.includes("401")) throw e; 
+                    if (i === retries - 1) throw e;
+                    await new Promise(r => setTimeout(r, 1000 * Math.pow(2, i)));
+                }
+            }
+        }
+
+        function base64ToWav(base64Data) {
+            const binaryString = window.atob(base64Data);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
+            
+            const wavHeader = new ArrayBuffer(44);
+            const view = new DataView(wavHeader);
+            const sampleRate = 24000;
+            const numChannels = 1;
+            
+            writeString(view, 0, 'RIFF'); view.setUint32(4, 36 + bytes.length, true);
+            writeString(view, 8, 'WAVE'); writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true); view.setUint16(20, 1, true);
+            view.setUint16(22, numChannels, true); view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true); view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true); writeString(view, 36, 'data');
+            view.setUint32(40, bytes.length, true);
+            
+            return URL.createObjectURL(new Blob([view, bytes], { type: 'audio/wav' }));
+        }
+        function writeString(v, o, s) { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); }
+
+        const log = (msg) => {
+            const el = document.getElementById('consoleOutput');
+            el.innerHTML += `<div>> ${msg}</div>`;
+            el.scrollTop = el.scrollHeight;
+        };
+
+        // --- Main ---
+        async function startGeneration() {
+            const btn = document.getElementById('generateBtn');
+            const resultArea = document.getElementById('resultArea');
+            const sourceText = document.getElementById('sourceText').value;
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+            document.getElementById('statusLog').classList.remove('hidden');
+            resultArea.classList.add('hidden');
+            document.getElementById('consoleOutput').innerHTML = '';
+
+            try {
+                // 1. Generate JSON Script
+                const jsonScript = await generateScriptJson(sourceText, currentMode);
+                log("脚本生成成功 (JSON)");
+
+                // 2. Generate Audio
+                const audioBase64 = await synthesizeFromJson(jsonScript, currentMode);
+                log("音频合成成功");
+
+                // 3. Render
+                const audioUrl = base64ToWav(audioBase64);
+                document.getElementById('audioPlayer').src = audioUrl;
+
+                // Render Chat Bubbles
+                const scriptContainer = document.getElementById('scriptDisplay');
+                scriptContainer.innerHTML = '';
+                jsonScript.forEach(line => {
+                    const isHost = line.speaker === 'Host' || line.speaker === 'Narrator';
+                    const bubbleClass = isHost ? 'chat-host' : 'chat-guest';
+                    scriptContainer.innerHTML += `
+                        <div class="chat-bubble ${bubbleClass} text-gray-300">
+                            <div class="chat-label">${line.speaker}</div>
+                            ${line.text}
+                        </div>
+                    `;
+                });
+
+                resultArea.classList.remove('hidden');
+
+            } catch (e) {
+                log(`Error: ${e.message}`);
+                alert("生成失败: " + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span>生成音频 (Generate)</span><i class="fas fa-magic"></i>`;
+            }
+        }
+    </script>
+</body>
+</html>

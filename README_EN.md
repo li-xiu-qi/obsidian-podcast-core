@@ -1,94 +1,173 @@
-# 🪄 auto tags / AI Tag Generator
+# 🎙️ Podcast Generator
 
-[中文版本](README.md)
+Transform your notes into engaging podcasts using AI. Generate scripts and audio with customizable voices for solo monologues or dialogues.
 
-"auto tags" is an Obsidian plugin that uses various Large Language Models (LLMs) to analyze documents and generate tags with a single click.
+[中文文档](./README.md)
 
-The plugin analyzes the document in the editor and any previously used tags (if available), returns up to 5 related existing tags, and generates up to 3 new suggested tags.
+## ✨ Features
 
-This project is forked from [lucagrippa/obsidian-ai-tagger](https://github.com/lucagrippa/obsidian-ai-tagger), with code updates and feature enhancements.
+- **🤖 AI-Powered Script Generation** - Automatically convert your notes into natural, engaging podcast scripts using LLM
+- **🎙️ Multiple Generation Modes** - Choose between monologue or dialogue formats
+- **🎵 Custom Voice Selection** - Select from multiple voice options for narrators and hosts
+- **📝 Script Preview** - Review and see the generated script before audio generation
+- **🔊 Audio Generation** - Convert scripts to high-quality audio using TTS technology
+- **💾 MP3 Export** - Download generated podcasts as MP3 files
+- **🌍 International Support** - Support for English and Chinese interfaces
+- **⚙️ Easy Configuration** - Simple setup with API key configuration
+- **🎨 Modern UI** - Beautiful, intuitive interface with real-time feedback
 
 ## 🚀 Quick Start
 
-1. Install and enable this plugin from Obsidian's [Community Plugins](https://obsidian.md/plugins).
-2. Enter your API key in the plugin settings (supports OpenAI, Ollama, and other compatible services).
-3. Choose a model (e.g., GPT-4o mini).
+### Installation
 
-## 📝 Usage
+1. Open Obsidian Settings → Third-party plugins → Community plugins
+2. Search for "Podcast Generator"
+3. Install and enable the plugin
 
-### One click tagging
+### Configuration
 
-- Click the "Wand" icon in the left sidebar to tag current note
+1. Open the plugin settings in Obsidian
+2. Configure the required API keys:
+   - **LLM API Key**: Your StepFun API key for script generation
+   - **TTS API Key**: Your StepFun API key for audio generation
+3. (Optional) Adjust voice preferences and default settings
 
-    ![One click tagging](images/one_click_tagging.gif)
+### Usage
 
-### Selection-Based Tagging
+1. Open a note with content you want to convert to podcast
+2. Click the "Podcast Generator" icon in the sidebar
+3. Select your preferred mode:
+   - **Solo Monologue**: Single narrator voice
+   - **Dialogue**: Two-speaker conversation format
+4. Choose voice options
+5. Click "Generate Podcast"
+6. Review the generated script and listen to the audio
+7. Click "Export MP3" to download
 
-- Highlight text and use Command Palette (Ctrl/Cmd + P) → "Generate tags"
+## 📖 How It Works
 
-    ![Precise tagging](images/precise_tagging.gif)
+### Generation Process
 
-### Batch Tagging
+```mermaid
+flowchart TD
+    A[Your Note Content] --> B[LLM Processing]
+    B --> C[Generated Podcast Script]
+    C --> D[TTS Processing]
+    D --> E[MP3 Audio File]
+    E --> F[Download & Listen]
+```
 
-- Right-click file(s) or folders to tag multiple documents
+### Monologue Mode
 
-    ![Multi-file tagging](images/multi_file_tagging.gif)
+- Single narrator presents the content
+- Natural flow suitable for educational or explanatory content
+- Consistent voice throughout
 
-## 🔧 Configuration Options
+### Dialogue Mode
 
-- Custom Endpoints: Set alternative API endpoints (supports Ollama and other compatible services)
-- Lowercase Tags: Force all tags to lowercase
-- Context Awareness: Plugin considers existing tags to avoid duplicates
+- Two speakers (Host and Guest) discuss the content
+- More engaging and dynamic
+- Natural conversation style
 
-    ![Context-aware tagging](images/context_aware_tagging.gif)
+## ⚙️ Settings
 
-## 🔧 Features
+### API Configuration
 
-### 1. Settings Management
+| Setting | Description |
+|---------|------------|
+| LLM API Key | API key for script generation (required, OpenAI SDK compatible) |
+| LLM Model | Model name (default: step-2-mini) |
+| LLM Base URL | API endpoint (default: `https://api.stepfun.com/v1`, OpenAI SDK compatible) |
+| TTS API Key | API key for audio generation (required, OpenAI SDK compatible) |
+| TTS Model | Model name (default: step-tts-2) |
+| TTS Base URL | API endpoint (default: `https://api.stepfun.com/v1`, OpenAI SDK compatible) |
 
-- Load and save plugin settings, including OpenAI API key, model name, base URL, and prompt language.
-- Support for default settings initialization and user custom configuration.
-- Allow users to configure API key, model selection (e.g., GPT-4o mini), and language preferences through the plugin settings tab.
+### Voice Settings
 
-### 2. Tag Generation
+| Setting | Description |
+|---------|------------|
+| Monologue Voice | Voice for solo mode |
+| Host Voice | Voice for dialogue host |
+| Guest Voice | Voice for dialogue guest |
 
-- Use AI (OpenAI) to generate relevant tags for document content.
-- Support processing pure content after removing frontmatter.
-- Generate more relevant tags based on all tags in the entire vault as context.
-- Avoid generating duplicate existing tags.
-- Analyze document content, return up to 5 related existing tags and up to 3 new suggested tags.
-- Support Chinese and English prompt languages, using predefined system prompts and examples.
+### Default Preferences
 
-### 3. Tag Application
+| Setting | Description |
+|---------|------------|
+| Default Language | Language for interface (Chinese/English) |
+| Default Mode | Default generation mode (Monologue/Dialogue) |
 
-- Add generated tags to the document's frontmatter.
-- Support appending new tags to the existing tag list.
-- Use Obsidian's processFrontMatter API to update document metadata.
+## 🎯 Use Cases
 
-### 4. Recursive Tag Generation
+### Educational Content
 
-- Support generating tags for individual files.
-- Support recursively generating tags for folders and all their subfiles.
-- Allow batch processing of multiple files for efficiency.
+Convert lecture notes into podcast episodes for studying on-the-go.
 
-### 5. User Interface Integration
+### Documentation
 
-- **Ribbon Icon**: Add an icon button in Obsidian's left toolbar to generate tags for the current active document.
-- **Editor Command**: Add a command for generating tags for selection or entire document, supporting command palette calls.
-- **File Menu Options**: Add options in the file right-click menu for generating tags for single or multiple files, supporting right-click batch operations.
+Turn technical documentation into audio guides.
 
-### 6. User Notifications
+### Blog Posts
 
-- Display progress notifications during tag generation.
-- Provide appropriate feedback on success or failure.
-- Use Obsidian's Notice API to display messages, such as generating, success, or error prompts.
+Generate podcast versions of your blog articles.
 
-## 🔗 More Info
+### Meeting Notes
 
-- [Quick Start Guide](docs/quick-start.md)
-- [Development Documentation](docs/development.md)
-- [License](LICENSE)
+Transform meeting minutes into recap podcasts.
+
+### Story Telling
+
+Convert story notes into narrated audio content.
+
+## 🛠️ Development
+
+### Requirements
+
+- Node.js 16+
+- npm or yarn
+
+### Setup
+
+```bash
+npm install
+npm run dev
+```
+
+### Build
+
+```bash
+npm run build
+```
+
+### Testing
+
+```bash
+npm run dev
+```
+
+## 📄 License
+
+MIT License - See LICENSE file for details
 
 ## 🤝 Contributing
 
-Found a bug or want a new feature? Open an Issue or submit a PR.
+Contributions are welcome! Please feel free to submit issues or pull requests.
+
+## 💬 Support
+
+For issues, feature requests, or questions:
+
+- Open an issue on [GitHub](https://github.com/li-xiu-qi/obsidian-podcast-core)
+
+## 🙏 Acknowledgments
+
+- Built with [Obsidian API](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin)
+- Uses [Vue 3](https://vuejs.org/) for UI
+- Integrates with [StepFun API](https://www.stepfun.com/)
+- UI components from [Naive UI](https://www.naiveui.com/)
+
+---
+
+**Version**: 0.01  
+**Author**: li-xiu-qi  
+**License**: MIT

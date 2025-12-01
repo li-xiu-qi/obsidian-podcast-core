@@ -1,10 +1,11 @@
 {
-	"id": "auto-tags",
-	"name": "Auto Tags",
-	"version": "0.0.1",
-	"minAppVersion": "0.15.0",
-	"description": "分析并一键为笔记生成标签，提升笔记组织效率。\nAnalyze and tag your document with one click for efficient note organization using AI.",
-	"author": "li-xiu-qi",
-	"authorUrl": "https://github.com/li-xiu-qi",
-	"isDesktopOnly": false
+    "id": "podcast-core",
+    "name": "Podcast Core",
+    "version": "0.01",
+    "minAppVersion": "0.15.6",
+    "description": "Transform your notes into engaging podcasts using AI. Generate scripts and audio with customizable voices for solo monologues or dialogues.",
+    "author": "li-xiu-qi",
+    "authorUrl": "https://github.com/li-xiu-qi",
+    "fundingUrl": "https://github.com/li-xiu-qi",
+    "isDesktopOnly": false
 }
