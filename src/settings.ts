@@ -24,6 +24,12 @@ export interface PodcastSettings {
 	hostVoice: string;
 	/** 双人模式嘉宾语音 */
 	guestVoice: string;
+	/** 主持人角色描述（可选，用于提示词中作为默认角色） */
+	hostPersona?: string;
+	/** 嘉宾角色描述（可选，用于提示词中作为默认角色） */
+	guestPersona?: string;
+	/** 讲述者角色描述（单人模式，可选） */
+	narratorPersona?: string;
 }
 
 /**
@@ -64,15 +70,20 @@ export const DEFAULT_SETTINGS: PodcastSettings = {
 	ttsBaseUrl: 'https://api.stepfun.com/v1',
 	language: 'zh',
 	defaultMode: 'monologue',
-	monologueVoice: 'qingchunshaonv',
-	hostVoice: 'wenrounansheng',
-	guestVoice: 'wenroushunv',
+	monologueVoice: 'qinhenvsheng',
+	hostVoice: 'qinhenvsheng',
+	guestVoice: 'wenrounansheng',
+	hostPersona: '亲切自然的女主持人，富有感染力，善于引导话题并提问。',
+	guestPersona: '沉稳、有洞察力的男嘉宾，善于提出观点并给出细致的分析。',
+	narratorPersona: '温柔自然的讲述者，语速适中、情感自然。',
 };
 
 /**
  * 播客设置标签页
  */
 import { App, PluginSettingTab, Setting } from 'obsidian';
+import { VOICE_OPTIONS } from './voices';
+import { VOICE_OPTIONS } from './voices';
 import type { PodcastPluginClass } from './plugin';
 
 export class PodcastSettingTab extends PluginSettingTab {
@@ -107,7 +118,7 @@ export class PodcastSettingTab extends PluginSettingTab {
 			.setName('LLM 模型')
 			.setDesc('使用的 LLM 模型')
 			.addText(text => text
-				.setPlaceholder('gpt-4o-mini')
+				.setPlaceholder('step-2-mini')
 				.setValue(this.plugin.settings.llmModel)
 				.onChange(async (value) => {
 					this.plugin.settings.llmModel = value;
@@ -118,7 +129,7 @@ export class PodcastSettingTab extends PluginSettingTab {
 			.setName('LLM 基础 URL')
 			.setDesc('LLM API 的基础 URL')
 			.addText(text => text
-				.setPlaceholder('https://api.openai.com/v1')
+				.setPlaceholder('https://api.stepfun.com/v1')
 				.setValue(this.plugin.settings.llmBaseUrl)
 				.onChange(async (value) => {
 					this.plugin.settings.llmBaseUrl = value;
@@ -191,34 +202,73 @@ export class PodcastSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName('单人模式语音')
 			.setDesc('单人模式的语音')
-			.addText(text => text
-				.setPlaceholder('alloy')
-				.setValue(this.plugin.settings.monologueVoice)
-				.onChange(async (value) => {
-					this.plugin.settings.monologueVoice = value;
-					await this.plugin.saveSettings();
-				}));
+			.addDropdown(dropdown => {
+				VOICE_OPTIONS.forEach(o => dropdown.addOption(o.value, o.label));
+				return dropdown
+					.setValue(this.plugin.settings.monologueVoice)
+					.onChange(async (value) => {
+						this.plugin.settings.monologueVoice = value;
+						await this.plugin.saveSettings();
+					});
+			});
 
 		new Setting(containerEl)
 			.setName('主持人语音')
 			.setDesc('对话模式的主持人语音')
-			.addText(text => text
-				.setPlaceholder('alloy')
-				.setValue(this.plugin.settings.hostVoice)
-				.onChange(async (value) => {
-					this.plugin.settings.hostVoice = value;
-					await this.plugin.saveSettings();
-				}));
+			.addDropdown(dropdown => {
+				VOICE_OPTIONS.forEach(o => dropdown.addOption(o.value, o.label));
+				return dropdown
+					.setValue(this.plugin.settings.hostVoice)
+					.onChange(async (value) => {
+						this.plugin.settings.hostVoice = value;
+						await this.plugin.saveSettings();
+					});
+			});
 
 		new Setting(containerEl)
 			.setName('嘉宾语音')
 			.setDesc('对话模式的嘉宾语音')
-			.addText(text => text
-				.setPlaceholder('echo')
-				.setValue(this.plugin.settings.guestVoice)
-				.onChange(async (value) => {
-					this.plugin.settings.guestVoice = value;
-					await this.plugin.saveSettings();
-				}));
+			.addDropdown(dropdown => {
+				VOICE_OPTIONS.forEach(o => dropdown.addOption(o.value, o.label));
+				return dropdown
+					.setValue(this.plugin.settings.guestVoice)
+					.onChange(async (value) => {
+						this.plugin.settings.guestVoice = value;
+						await this.plugin.saveSettings();
+					});
+			});
+
+				new Setting(containerEl)
+					.setName('主持人角色描述')
+					.setDesc('对话模式下主持人的默认角色描述（用于生成提示词）')
+					.addText(text => text
+						.setPlaceholder('友好、引导性强的主持人...')
+						.setValue(this.plugin.settings.hostPersona || '')
+						.onChange(async (value) => {
+							this.plugin.settings.hostPersona = value;
+							await this.plugin.saveSettings();
+						}));
+
+				new Setting(containerEl)
+					.setName('嘉宾角色描述')
+					.setDesc('对话模式下嘉宾的默认角色描述（用于生成提示词）')
+					.addText(text => text
+						.setPlaceholder('知识渊博、条理清晰...')
+						.setValue(this.plugin.settings.guestPersona || '')
+						.onChange(async (value) => {
+							this.plugin.settings.guestPersona = value;
+							await this.plugin.saveSettings();
+						}));
+
+				new Setting(containerEl)
+					.setName('讲述者角色描述')
+					.setDesc('单人模式下讲述者的默认角色描述（用于生成提示词）')
+					.addText(text => text
+						.setPlaceholder('温柔自然的讲述者...')
+						.setValue(this.plugin.settings.narratorPersona || '')
+						.onChange(async (value) => {
+							this.plugin.settings.narratorPersona = value;
+							await this.plugin.saveSettings();
+						}));
 	}
 }

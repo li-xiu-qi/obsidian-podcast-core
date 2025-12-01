@@ -45,7 +45,9 @@ Obsidian Podcast Core 是一个Obsidian插件，旨在将用户的Markdown笔记
 - **音频格式**: MP3格式
 - **语音选项**:
   - 单人模式: qinhenvsheng (Female - Natural)
+  - 默认讲述者角色描述: 温柔自然的讲述者，语速适中、情感自然。
   - 双人模式: Host (qinhenvsheng), Guest (wenrounansheng)
+  - 默认角色描述: Host - 友好、引导性强的主持人；Guest - 知识渊博、条理清晰的嘉宾。
 
 ### 5. 用户界面
 

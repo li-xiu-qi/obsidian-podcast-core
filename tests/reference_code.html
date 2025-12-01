@@ -220,10 +220,10 @@
                 container.innerHTML = `
                     <div class="pt-2">
                         <label class="block text-xs text-gray-500 mb-1">讲述者</label>
-                        <select id="singleVoice" class="w-full bg-[#2a2a2a] border border-[#363636] rounded px-2 py-1.5 text-xs text-gray-300 outline-none focus:border-[#7b6cd9]">
-                            <option value="Zephyr">Zephyr (Male - Deep)</option>
-                            <option value="Puck">Puck (Male - Calm)</option>
-                            <option value="Kore">Kore (Female - Soothing)</option>
+                            <select id="singleVoice" class="w-full bg-[#2a2a2a] border border-[#363636] rounded px-2 py-1.5 text-xs text-gray-300 outline-none focus:border-[#7b6cd9]">
+                            <option value="Zephyr">泽菲尔 - 低沉</option>
+                            <option value="Puck">佩克 - 平静</option>
+                            <option value="Kore">科雷 - 舒缓</option>
                         </select>
                     </div>`;
             } else {
@@ -232,15 +232,15 @@
                         <div>
                             <label class="block text-xs text-gray-500 mb-1">Host (主持人)</label>
                             <select id="hostVoice" class="w-full bg-[#2a2a2a] border border-[#363636] rounded px-2 py-1.5 text-xs text-gray-300 outline-none focus:border-[#7b6cd9]">
-                                <option value="Puck">Puck (Male)</option>
-                                <option value="Zephyr">Zephyr (Male)</option>
+                                <option value="Puck">佩克</option>
+                                <option value="Zephyr">泽菲尔</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs text-gray-500 mb-1">Guest (嘉宾)</label>
                             <select id="guestVoice" class="w-full bg-[#2a2a2a] border border-[#363636] rounded px-2 py-1.5 text-xs text-gray-300 outline-none focus:border-[#7b6cd9]">
-                                <option value="Kore">Kore (Female)</option>
-                                <option value="Leda">Leda (Female)</option>
+                                <option value="Kore">科雷</option>
+                                <option value="Leda">莱达</option>
                             </select>
                         </div>
                     </div>`;
@@ -256,6 +256,7 @@
             if (mode === 'monologue') {
                 systemPrompt = `
                 Role: Podcast Host.
+                Default Narrator Persona: 温柔自然的讲述者，语速适中、情感自然。
                 Task: Convert the input notes into a monologue script.
                 Output Format: STRICT JSON Array.
                 Example: [{"speaker": "Narrator", "text": "Welcome back..."}]
@@ -264,6 +265,7 @@
             } else {
                 systemPrompt = `
                 Role: Podcast Producer.
+                Default Role Descriptions: Host - 友好、引导性强的主持人；Guest - 知识渊博、条理清晰的嘉宾。
                 Task: Convert notes into a dialogue between Host and Guest.
                 Output Format: STRICT JSON Array.
                 Example: [{"speaker": "Host", "text": "Hello..."}, {"speaker": "Guest", "text": "Hi..."}]

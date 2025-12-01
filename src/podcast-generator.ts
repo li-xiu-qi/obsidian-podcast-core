@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import { Notice } from 'obsidian';
 import type { PodcastSettings } from './settings';
-import { PODCAST_SYSTEM_PROMPT, MONOLOGUE_PROMPT, DIALOGUE_PROMPT } from './llm-prompts';
+import { PODCAST_SYSTEM_PROMPT, buildCompletePrompt } from './llm-prompts';
 
 export interface PodcastScript {
     speaker: string;
@@ -24,11 +24,15 @@ export async function generatePodcastScript(
         throw new Error('LLM API Key is not configured. Please set it in settings.');
     }
 
-    const prompt = mode === 'monologue' ? MONOLOGUE_PROMPT : DIALOGUE_PROMPT;
+    const userPrompt = buildCompletePrompt(mode, content, {
+        narrator: (settings as any)?.narratorPersona,
+        host: (settings as any)?.hostPersona,
+        guest: (settings as any)?.guestPersona,
+    });
 
     const messages = [
         { role: 'system' as const, content: PODCAST_SYSTEM_PROMPT },
-        { role: 'user' as const, content: `${prompt}\n\nContent:\n${content}` }
+        { role: 'user' as const, content: userPrompt }
     ];
 
     const requestBody = {

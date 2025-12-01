@@ -70,42 +70,6 @@
                 </NButtonGroup>
             </div>
 
-            <!-- Voice Configuration -->
-            <div class="podcast-card">
-                <div class="card-header">
-                    <Icon>
-                        <VolumeHigh />
-                    </Icon>
-                    <span>{{ t('Voice Configuration') }}</span>
-                </div>
-                <div v-if="currentMode === 'monologue'" class="config-item">
-                    <label class="config-label">{{ t('Narrator Voice') }}</label>
-                    <NSelect
-                        v-model:value="settings.monologueVoice"
-                        :options="voiceOptions"
-                        size="medium"
-                    />
-                </div>
-                <div v-else class="config-grid">
-                    <div class="config-item">
-                        <label class="config-label">{{ t('Host Voice') }}</label>
-                        <NSelect
-                            v-model:value="settings.hostVoice"
-                            :options="voiceOptions"
-                            size="medium"
-                        />
-                    </div>
-                    <div class="config-item">
-                        <label class="config-label">{{ t('Guest Voice') }}</label>
-                        <NSelect
-                            v-model:value="settings.guestVoice"
-                            :options="voiceOptions"
-                            size="medium"
-                        />
-                    </div>
-                </div>
-            </div>
-
             <!-- Generate Button -->
             <NButton
                 type="primary"
@@ -227,8 +191,10 @@ import {
     NButton,
     NButtonGroup,
     NSelect,
+    NInput,
     type SelectOption,
 } from 'naive-ui';
+import { VOICE_OPTIONS } from '../voices';
 import { Icon } from "@vicons/utils";
 import { PersonCircle, PeopleCircle, PlayCircle, Download, Mic, Language, Settings, VolumeHigh, Cog, CheckmarkCircle, CloseCircle, Time, MusicalNote, DocumentText, Copy } from '@vicons/ionicons5';
 import { t } from '../lang/helper';
@@ -256,17 +222,21 @@ const script = ref<PodcastScript[] | null>(null);
 const audioUrl = ref<string | null>(null);
 const currentLanguage = ref<string>(window.localStorage.getItem("language") || "en");
 
-// 设置
-const settings = reactive({
+// 设置 - 使用 computed 自动同步插件设置的改动
+const settings = computed(() => ({
     monologueVoice: plugin.settings.monologueVoice || 'qinhenvsheng',
     hostVoice: plugin.settings.hostVoice || 'qinhenvsheng',
     guestVoice: plugin.settings.guestVoice || 'wenrounansheng',
-});
+    hostPersona: plugin.settings.hostPersona || '亲切自然的女主持人，富有感染力，善于引导话题并提问。',
+    guestPersona: plugin.settings.guestPersona || '沉稳、有洞察力的男嘉宾，善于提出观点并给出细致的分析。',
+    narratorPersona: plugin.settings.narratorPersona || '温柔自然的讲述者，语速适中、情感自然。',
+}));
 
 // 音色选项
 const voiceOptions: SelectOption[] = [
-    { label: 'qinhenvsheng (女性)', value: 'qinhenvsheng' },
-    { label: 'wenrounansheng (男性)', value: 'wenrounansheng' },
+    { label: '清新女声', value: 'qinhenvsheng' },
+    { label: '温柔男声', value: 'wenrounansheng' },
+    { label: '温柔女声', value: 'wenroushunv' },
 ];
 
 // 语言选项
@@ -339,16 +309,18 @@ const generatePodcast = async () => {
         const currentFile = plugin.app.workspace.getActiveFile();
         const content = currentFile ? await plugin.app.vault.read(currentFile) : '';
         
+        const requestSettings: any = plugin.settings;
+
         const generatedScript = await generatePodcastScript(
             content,
-            plugin.settings,
+            requestSettings,
             currentMode.value
         );
         script.value = generatedScript;
         addLog(t('Script generated successfully'));
 
         addLog(t('Generating audio...'));
-        const url = await generateAudio(generatedScript, plugin.settings, currentMode.value);
+        const url = await generateAudio(generatedScript, requestSettings, currentMode.value);
         audioUrl.value = url;
         addLog(t('Audio generated successfully'));
 

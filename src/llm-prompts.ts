@@ -28,9 +28,10 @@ Narrator: 突然间，我意识到了一些重要的东西。
 - **结构清晰**：开场要吸引注意力，主体清晰论述，结尾要留白`;
 
 /** 独白提示：用于生成单个叙述者独白的播客脚本 */
-export const MONOLOGUE_PROMPT = `基于以下内容生成播客脚本。
+export const MONOLOGUE_PROMPT = (narratorPersona = '温柔自然的讲述者，语速适中、情感自然。') => `基于以下内容生成播客脚本。
 
 **模式：独白模式**
+**默认讲述者角色**: ${narratorPersona}
 - 只有一个说话者："Narrator"
 - 生成自然流畅的独白内容
 - 语言要接地气，避免生硬的学术用语
@@ -42,9 +43,12 @@ Narrator: [具体的内容]
 不要输出 JSON、不要输出代码块、不要使用任何特殊标记`;
 
 /** 对话提示：用于生成主持人与嘉宾对话的播客脚本 */
-export const DIALOGUE_PROMPT = `基于以下内容生成播客脚本。
+export const DIALOGUE_PROMPT = (hostPersona = '友好、引导性强的主持人，善于提出问题并引导话题。', guestPersona = '知识渊博、条理清晰的嘉宾，善于阐述观点并给出建议。') => `基于以下内容生成播客脚本。
 
 **模式：对话模式**
+**默认角色描述**：
+- Host（主持人）: ${hostPersona}
+- Guest（嘉宾）: ${guestPersona}
 - 两个说话者交替对话："Host" 和 "Guest"
 - Host 是主持人，主要提出问题和推进话题
 - Guest 是嘉宾，主要回答问题和分享观点
@@ -60,7 +64,13 @@ Guest: [嘉宾说的话]
 /**
  * 创建播客脚本的完整提示词（包含系统提示 + 创意指导）
  */
-export function buildCompletePrompt(mode: 'monologue' | 'dialogue', content: string): string {
-    const modePrompt = mode === 'monologue' ? MONOLOGUE_PROMPT : DIALOGUE_PROMPT;
-    return `${PODCAST_SYSTEM_PROMPT}\n\n${modePrompt}\n\nContent:\n${content}`;
+export function buildCompletePrompt(
+    mode: 'monologue' | 'dialogue',
+    content: string,
+    personas?: { narrator?: string; host?: string; guest?: string }
+): string {
+    const modePrompt = mode === 'monologue'
+        ? MONOLOGUE_PROMPT(personas?.narrator)
+        : DIALOGUE_PROMPT(personas?.host, personas?.guest);
+    return `${modePrompt}\n\nContent:\n${content}`;
 }
