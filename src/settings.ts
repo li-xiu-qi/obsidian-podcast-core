@@ -83,7 +83,6 @@ export const DEFAULT_SETTINGS: PodcastSettings = {
  */
 import { App, PluginSettingTab, Setting } from 'obsidian';
 import { VOICE_OPTIONS } from './voices';
-import { VOICE_OPTIONS } from './voices';
 import type { PodcastPluginClass } from './plugin';
 
 export class PodcastSettingTab extends PluginSettingTab {
